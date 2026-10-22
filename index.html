@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GeoSpace - Geografía Secundaria</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              main: '#0f172a', 
+              accent: '#38bdf8', 
+              card: '#1e293b' 
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    .card-shadow { box-shadow: 0 8px 24px rgba(0,0,0,0.1); }
+    .animate-fade-in { animation: fadeIn 0.4s ease-in-out forwards; }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-5px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .tab-active { background-color: #38bdf8; color: #0f172a; font-weight: 900; border-radius: 0.5rem; }
+    .tab-inactive { color: #94a3b8; font-weight: 600; }
+    .tab-inactive:hover { color: #f8fafc; background-color: rgba(255,255,255,0.1); border-radius: 0.5rem; }
+  </style>
+</head>
+<body class="bg-slate-100 font-sans text-slate-800 min-h-screen flex flex-col">
+
+  <!-- Header Superior -->
+  <header class="bg-brand-main text-white sticky top-0 z-50 shadow-xl">
+    <div class="max-w-7xl mx-auto px-4 py-4 flex flex-wrap justify-between items-center gap-4">
+      
+      <!-- Logo -->
+      <div class="flex items-center gap-3">
+        <div class="bg-brand-accent text-brand-main w-12 h-12 rounded-xl flex items-center justify-center font-black text-3xl shadow-[0_0_15px_rgba(56,189,248,0.5)]">
+          <i class="fa-solid fa-earth-americas"></i>
+        </div>
+        <div class="flex items-center gap-2">
+          <h1 class="text-3xl font-black tracking-tight text-white">Geo<span class="text-brand-accent">Space</span></h1>
+        </div>
+      </div>
+
+      <!-- Navegación Tabs -->
+      <div class="flex gap-2 bg-brand-card p-1.5 rounded-lg border border-slate-700 overflow-x-auto">
+        <button onclick="switchTab('quiz')" id="tab-quiz" class="tab-active px-5 py-2 transition flex items-center gap-2 text-sm whitespace-nowrap">
+          <i class="fa-solid fa-gamepad"></i> Retos
+        </button>
+        <button onclick="switchTab('mapas')" id="tab-mapas" class="tab-inactive px-5 py-2 transition flex items-center gap-2 text-sm whitespace-nowrap">
+          <i class="fa-solid fa-map"></i> Mapoteca
+        </button>
+        <button onclick="switchTab('universo')" id="tab-universo" class="tab-inactive px-5 py-2 transition flex items-center gap-2 text-sm whitespace-nowrap">
+          <i class="fa-solid fa-meteor"></i> Cosmos
+        </button>
+      </div>
+
+      <!-- Controles de Audio Nativos y Marcador -->
+      <div class="flex items-center gap-3">
+        <!-- Reproductor HTML5 Visible (Cero bloqueos) -->
+        <div class="bg-slate-800 p-1.5 rounded-lg border border-slate-600 flex items-center gap-2">
+          <span class="text-xs text-brand-accent font-bold px-2 hidden sm:inline"><i class="fa-solid fa-music"></i> Vivaldi:</span>
+          <audio controls id="nativeAudio" class="h-8 w-48 sm:w-56 accent-sky-400">
+            <source src="vivaldivi1.mp3" type="audio/mp3">
+            Tu navegador no soporta audio.
+          </audio>
+        </div>
+
+        <div class="bg-slate-800 px-4 py-2 rounded-lg border border-slate-600 flex gap-4">
+          <div class="text-center">
+            <div class="text-[10px] uppercase font-bold text-slate-400">Puntos</div>
+            <div class="text-brand-accent font-black text-lg leading-none" id="scoreDisplay">0</div>
+          </div>
+          <div class="w-[1px] bg-slate-600"></div>
+          <div class="text-center">
+            <div class="text-[10px] uppercase font-bold text-slate-400">Aciertos</div>
+            <div class="text-white font-black text-lg leading-none" id="aciertosDisplay">0/0</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ================= PESTAÑA 1: RETOS ================= -->
+  <div id="section-quiz" class="flex-1 flex flex-col w-full">
+    <div class="max-w-7xl mx-auto px-4 py-8 flex flex-col lg:flex-row gap-8 w-full">
+      
+      <!-- Sidebar Filtros -->
+      <aside class="w-full lg:w-72 flex-shrink-0">
+        <div class="bg-white rounded-3xl p-6 card-shadow border border-slate-200 sticky top-28">
+          <div class="flex items-center justify-between border-b border-slate-100 pb-4 mb-4">
+            <h3 class="font-black text-lg text-slate-800"><i class="fa-solid fa-filter text-brand-accent"></i> Temario</h3>
+            <button onclick="resetQuiz('all')" class="text-xs text-white font-bold bg-slate-800 hover:bg-slate-700 px-3 py-1.5 rounded-lg transition">Ver Todo</button>
+          </div>
+
+          <nav class="space-y-4">
+            <div>
+              <button onclick="toggleAccordion('acc-eje1')" class="w-full text-left p-3 rounded-xl bg-slate-50 text-slate-800 font-black border border-slate-200 flex items-center justify-between hover:bg-slate-100 transition">
+                <span>1. Análisis Espacial</span>
+                <i class="fa-solid fa-chevron-down text-xs text-slate-400"></i>
+              </button>
+              <div id="acc-eje1" class="pl-4 mt-2 space-y-2 animate-fade-in border-l-2 border-slate-200 ml-4 hidden">
+                <button onclick="resetQuiz('Sec. 1')" class="w-full text-left text-sm font-semibold text-slate-500 hover:text-brand-accent transition py-1">Sec. 1: Espacio Geográfico</button>
+                <button onclick="resetQuiz('Sec. 2')" class="w-full text-left text-sm font-semibold text-slate-500 hover:text-brand-accent transition py-1">Sec. 2: Cartografía</button>
+                <button onclick="resetQuiz('Sec. 3')" class="w-full text-left text-sm font-semibold text-slate-500 hover:text-brand-accent transition py-1">Sec. 3: SIG</button>
+              </div>
+            </div>
+
+            <div>
+              <button onclick="toggleAccordion('acc-eje2')" class="w-full text-left p-3 rounded-xl bg-slate-50 text-slate-800 font-black border border-slate-200 flex items-center justify-between hover:bg-slate-100 transition">
+                <span>2. Naturaleza y Sociedad</span>
+                <i class="fa-solid fa-chevron-down text-xs text-slate-400"></i>
+              </button>
+              <div id="acc-eje2" class="pl-4 mt-2 space-y-2 animate-fade-in border-l-2 border-slate-200 ml-4 hidden">
+                <button onclick="resetQuiz('Sec. 4')" class="w-full text-left text-sm font-semibold text-slate-500 hover:text-brand-accent transition py-1">Sec. 4: Tectónica y Sismos</button>
+                <button onclick="resetQuiz('Sec. 5')" class="w-full text-left text-sm font-semibold text-slate-500 hover:text-brand-accent transition py-1">Sec. 5: Aguas Continentales</button>
+                <button onclick="resetQuiz('Sec. 6')" class="w-full text-left text-sm font-semibold text-slate-500 hover:text-brand-accent transition py-1">Sec. 6: Climas Köppen</button>
+              </div>
+            </div>
+          </nav>
+        </div>
+      </aside>
+
+      <!-- Área de Preguntas -->
+      <main class="flex-1 space-y-6">
+        <div class="bg-white rounded-2xl p-4 card-shadow border border-slate-200 flex flex-wrap items-center justify-between gap-4">
+          <h3 class="font-extrabold text-slate-800 text-sm flex items-center gap-2 bg-slate-100 px-3 py-1.5 rounded-lg" id="filtroActualTexto">
+            <i class="fa-solid fa-layer-group text-brand-accent"></i> Todas las Secuencias
+          </h3>
+          <div class="flex items-center gap-2">
+            <button onclick="toggleExplanations()" id="btnToggleExpl" class="text-xs font-bold bg-slate-50 hover:bg-slate-100 text-slate-700 px-4 py-2.5 rounded-xl border border-slate-200 transition shadow-sm">
+              <i class="fa-solid fa-eye text-brand-accent"></i> Respuestas
+            </button>
+            <button onclick="resetQuiz('current')" class="text-xs font-bold bg-brand-main hover:bg-slate-800 text-white px-4 py-2.5 rounded-xl transition shadow-sm flex items-center gap-2">
+              <i class="fa-solid fa-rotate-right"></i> Refrescar
+            </button>
+          </div>
+        </div>
+        <div id="questionsContainer" class="space-y-6"></div>
+      </main>
+    </div>
+  </div>
+
+  <!-- ================= PESTAÑA 2: MAPOTECA ================= -->
+  <div id="section-mapas" class="hidden flex-1 max-w-7xl mx-auto px-4 py-10 w-full animate-fade-in">
+    <div class="mb-10 text-center">
+      <h2 class="text-4xl font-black text-brand-main"><i class="fa-solid fa-map-location-dot text-brand-accent"></i> Mapoteca Oficial</h2>
+      <p class="text-slate-500 mt-2 font-medium">Recursos cartográficos esenciales en alta definición.</p>
+    </div>
+    
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+      <div class="bg-white p-6 rounded-3xl card-shadow border border-slate-200 flex flex-col">
+        <h3 class="font-extrabold text-lg text-slate-800 mb-1">Placas Tectónicas</h3>
+        <p class="text-xs text-slate-500 mb-4">Límites y zonas de subducción.</p>
+        <div class="bg-slate-900 rounded-2xl overflow-hidden flex-1 relative min-h-[250px] flex items-center justify-center p-4">
+          <div class="text-center text-sky-400">
+            <i class="fa-solid fa-earth-americas text-6xl mb-2"></i>
+            <div class="text-sm font-bold text-white">Esquema de Placas Tectónicas</div>
+            <div class="text-xs text-slate-400 mt-1">Divergentes, convergentes y transformantes</div>
+          </div>
+        </div>
+      </div>
+      <div class="bg-white p-6 rounded-3xl card-shadow border border-slate-200 flex flex-col">
+        <h3 class="font-extrabold text-lg text-slate-800 mb-1">Climas de Köppen</h3>
+        <p class="text-xs text-slate-500 mb-4">Distribución global de climas.</p>
+        <div class="bg-slate-900 rounded-2xl overflow-hidden flex-1 relative min-h-[250px] flex items-center justify-center p-4">
+          <div class="text-center text-emerald-400">
+            <i class="fa-solid fa-cloud-sun text-6xl mb-2"></i>
+            <div class="text-sm font-bold text-white">Clasificación Climática A, B, C, D, E</div>
+            <div class="text-xs text-slate-400 mt-1">Zonas térmicas y de precipitación</div>
+          </div>
+        </div>
+      </div>
+      <div class="bg-white p-6 rounded-3xl card-shadow border border-slate-200 flex flex-col">
+        <h3 class="font-extrabold text-lg text-slate-800 mb-1">Husos Horarios</h3>
+        <p class="text-xs text-slate-500 mb-4">Meridianos y zonas horarias.</p>
+        <div class="bg-slate-900 rounded-2xl overflow-hidden flex-1 relative min-h-[250px] flex items-center justify-center p-4">
+          <div class="text-center text-amber-400">
+            <i class="fa-solid fa-clock text-6xl mb-2"></i>
+            <div class="text-sm font-bold text-white">Meridiano de Greenwich</div>
+            <div class="text-xs text-slate-400 mt-1">Cálculo mundial del tiempo estándar</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= PESTAÑA 3: COSMOS Y UNIVERSO ================= -->
+  <div id="section-universo" class="hidden flex-1 bg-brand-main w-full animate-fade-in text-slate-300 pb-12">
+    <div class="max-w-7xl mx-auto px-4 py-12">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        <div class="lg:col-span-8 space-y-8">
+          <div class="bg-brand-card border border-slate-700 rounded-3xl p-8 shadow-2xl relative overflow-hidden">
+            <div class="absolute top-0 right-0 p-6 opacity-10"><i class="fa-solid fa-user-astronaut text-9xl"></i></div>
+            <div class="relative z-10">
+              <div class="flex items-center gap-3 mb-6">
+                <div class="bg-amber-400 text-slate-900 w-12 h-12 rounded-xl flex items-center justify-center font-black text-2xl"><i class="fa-solid fa-bolt"></i></div>
+                <h3 class="text-3xl font-black text-white">¿Sabías qué?</h3>
+              </div>
+              <div class="bg-slate-900 p-6 rounded-2xl border border-slate-700 min-h-[140px] flex items-center shadow-inner">
+                <p id="fact-display" class="text-xl text-brand-accent font-medium leading-relaxed">
+                  Haz clic en los botones para descubrir datos asombrosos del universo.
+                </p>
+              </div>
+              <div class="flex flex-wrap gap-3 mt-6">
+                <button onclick="showFact(0)" class="bg-slate-700 hover:bg-brand-accent hover:text-slate-900 text-white px-5 py-2.5 rounded-xl font-bold transition">Orión y Betelgeuse</button>
+                <button onclick="showFact(1)" class="bg-slate-700 hover:bg-brand-accent hover:text-slate-900 text-white px-5 py-2.5 rounded-xl font-bold transition">Estrella Sirio</button>
+                <button onclick="showFact(2)" class="bg-slate-700 hover:bg-brand-accent hover:text-slate-900 text-white px-5 py-2.5 rounded-xl font-bold transition">Júpiter</button>
+              </div>
+            </div>
+          </div>
+          <div class="bg-brand-card border border-slate-700 rounded-3xl p-8 shadow-2xl">
+            <h3 class="text-2xl font-black text-white mb-6 border-b border-slate-700 pb-4"><i class="fa-solid fa-globe text-emerald-400"></i> Movimientos y Estaciones</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div class="bg-slate-900 p-5 rounded-2xl border border-slate-700">
+                <h4 class="font-black text-brand-accent text-lg mb-2">1. Rotación</h4>
+                <p class="text-sm">Giro sobre su eje (24h). Define el día, la noche y husos horarios.</p>
+              </div>
+              <div class="bg-slate-900 p-5 rounded-2xl border border-slate-700">
+                <h4 class="font-black text-brand-accent text-lg mb-2">2. Traslación</h4>
+                <p class="text-sm">Órbita anual alrededor del Sol. Da origen a las <strong class="text-white">4 Estaciones</strong> por la inclinación del eje.</p>
+              </div>
+              <div class="bg-slate-900 p-5 rounded-2xl border border-slate-700">
+                <h4 class="font-black text-brand-accent text-lg mb-2">3. Precesión</h4>
+                <p class="text-sm">Lento bamboleo cónico del eje terrestre similar a un trompo.</p>
+              </div>
+              <div class="bg-slate-900 p-5 rounded-2xl border border-slate-700">
+                <h4 class="font-black text-brand-accent text-lg mb-2">4. Nutación</h4>
+                <p class="text-sm">Pequeña oscilación superpuesta provocada por la gravedad lunar.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="lg:col-span-4 space-y-8">
+          <div class="bg-brand-card rounded-3xl border border-slate-700 overflow-hidden relative min-h-[350px] shadow-2xl flex items-center justify-center p-6 bg-slate-900">
+            <div class="text-center">
+              <i class="fa-solid fa-earth-europe text-8xl text-brand-accent mb-4"></i>
+              <h4 class="font-black text-white text-xl mb-1">La Canica Azul</h4>
+              <p class="text-sm text-slate-400">Perspectiva global de nuestro hogar en el cosmos.</p>
+            </div>
+          </div>
+          <div class="bg-brand-card p-6 rounded-3xl border border-slate-700 shadow-2xl">
+            <h4 class="font-black text-white text-lg mb-4"><i class="fa-solid fa-moon text-amber-100"></i> Fases de la Luna</h4>
+            <ul class="space-y-3">
+              <li class="flex items-center gap-3 bg-slate-900 p-3 rounded-xl border border-slate-700"><div class="w-8 h-8 rounded-full bg-slate-800 border"></div><span class="text-xs font-bold text-white">Luna Nueva</span></li>
+              <li class="flex items-center gap-3 bg-slate-900 p-3 rounded-xl border border-slate-700"><div class="w-8 h-8 rounded-full bg-slate-800 border relative overflow-hidden"><div class="absolute right-0 top-0 bottom-0 w-1/2 bg-white"></div></div><span class="text-xs font-bold text-white">Cuarto Creciente</span></li>
+              <li class="flex items-center gap-3 bg-slate-900 p-3 rounded-xl border border-slate-700"><div class="w-8 h-8 rounded-full bg-white border shadow-sm"></div><span class="text-xs font-bold text-white">Luna Llena</span></li>
+              <li class="flex items-center gap-3 bg-slate-900 p-3 rounded-xl border border-slate-700"><div class="w-8 h-8 rounded-full bg-slate-800 border relative overflow-hidden"><div class="absolute left-0 top-0 bottom-0 w-1/2 bg-white"></div></div><span class="text-xs font-bold text-white">Cuarto Menguante</span></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="bg-slate-900 text-slate-400 py-6 text-center text-xs mt-auto border-t border-slate-800">
+    <p class="font-bold">GeoSpace - Geografía Secundaria (SEP) | Desarrollado con el apoyo académico del <span class="text-brand-accent">Maestro José Guadalupe García Lucio</span></p>
+  </footer>
+
+  <!-- SCRIPT -->
+  <script>
+    function switchTab(tabId) {
+      document.getElementById('section-quiz').classList.add('hidden');
+      document.getElementById('section-mapas').classList.add('hidden');
+      document.getElementById('section-universo').classList.add('hidden');
+
+      ['quiz', 'mapas', 'universo'].forEach(t => {
+        document.getElementById(`tab-${t}`).className = "tab-inactive px-5 py-2 transition flex items-center gap-2 text-sm whitespace-nowrap";
+      });
+
+      document.getElementById(`section-${tabId}`).classList.remove('hidden');
+      document.getElementById(`tab-${tabId}`).className = "tab-active px-5 py-2 transition flex items-center gap-2 text-sm whitespace-nowrap shadow-md";
+    }
+
+    function toggleAccordion(id) {
+      document.getElementById(id).classList.toggle('hidden');
+    }
+
+    const facts = [
+      "Desde tu patio, en invierno, puedes observar la constelación de Orión y su estrella Betelgeuse, una supergigante roja inmensa.",
+      "La estrella Sirio es la más brillante del cielo nocturno y se encuentra en la constelación del Can Mayor.",
+      "Júpiter posee un campo magnético colosal y un sistema de lunas fascinante visible con telescopio casero."
+    ];
+    function showFact(index) {
+      const display = document.getElementById('fact-display');
+      if (!display) return;
+      display.style.opacity = 0;
+      setTimeout(() => { display.innerText = `"${facts[index]}"`; display.style.opacity = 1; }, 200);
+    }
+
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
+    let audioCtx = null;
+    function initAudio() { if (!audioCtx) audioCtx = new AudioContext(); }
+
+    function playSound(type) {
+      try {
+        initAudio();
+        if (!audioCtx) return;
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain); gain.connect(audioCtx.destination);
+        const now = audioCtx.currentTime;
+        if (type === 'correct') {
+          osc.type = 'sine'; osc.frequency.setValueAtTime(523.25, now); osc.frequency.exponentialRampToValueAtTime(880, now + 0.15);
+          gain.gain.setValueAtTime(0.3, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.35);
+          osc.start(now); osc.stop(now + 0.35);
+        } else {
+          osc.type = 'triangle'; osc.frequency.setValueAtTime(220, now); osc.frequency.setValueAtTime(180, now + 0.1);
+          gain.gain.setValueAtTime(0.25, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+          osc.start(now); osc.stop(now + 0.3);
+        }
+      } catch (e) {}
+    }
+
+    const questionsPool = [
+      { id: 1, secuencia: "Sec. 1", eje: "Eje 1", pregunta: "¿Cuáles son los 5 componentes principales que integran el espacio geográfico?", opciones: ["Geológicos, Climáticos, Marítimos", "Naturales, Sociales, Culturales, Económicos, Políticos", "Rurales, Urbanos, Industriales", "Físicos, Biológicos, Históricos"], correcta: 1, explicacion: "El espacio se forma por la interrelación de estos 5 componentes constantes.", referencia: "Página 16" },
+      { id: 2, secuencia: "Sec. 2", eje: "Eje 1", pregunta: "¿Qué representación cartográfica conserva mejor la forma esférica de la Tierra?", opciones: ["Croquis", "Mapa plano", "Globo Terráqueo", "Plano urbano"], correcta: 2, explicacion: "Mantiene la proporción real sin la deformación de los mapas planos.", referencia: "Página 25" },
+      { id: 3, secuencia: "Sec. 3", eje: "Eje 1", pregunta: "¿Qué tecnología digital superpone capas de información geográfica?", opciones: ["Fotografía aérea", "Sistema de Información Geográfica (SIG)", "Brújula", "Atlas"], correcta: 1, explicacion: "Los SIG organizan datos en capas digitales para optimizar decisiones.", referencia: "Página 38" },
+      { id: 4, secuencia: "Sec. 4", eje: "Eje 2", pregunta: "¿Cómo se clasifican los sismos y erupciones volcánicas según su origen?", opciones: ["Riesgos Químicos", "Riesgos Geológicos", "Riesgos Hidrometeorológicos", "Riesgos Sociales"], correcta: 1, explicacion: "Son riesgos geológicos originados por la dinámica de la corteza.", referencia: "Página 96" },
+      { id: 5, secuencia: "Sec. 4", eje: "Eje 2", pregunta: "¿Qué placa tectónica se subduce bajo la Norteamericana generando sismos en México?", opciones: ["Pacífico", "Placa de Cocos", "San Andrés", "Caribe"], correcta: 1, explicacion: "Su subducción genera intensa actividad sísmica en el país.", referencia: "Página 51" },
+      { id: 6, secuencia: "Sec. 5", eje: "Eje 2", pregunta: "¿Qué porcentaje del agua dulce del planeta está disponible en ríos y lagos?", opciones: ["50%", "25%", "Cerca del 1%", "10%"], correcta: 1, explicacion: "La mayoría del agua dulce es glaciar; solo ~1% es accesible.", referencia: "Página 65" },
+      { id: 7, secuencia: "Sec. 6", eje: "Eje 2", pregunta: "¿Qué letra de Köppen identifica a los climas desérticos?", opciones: ["A", "B", "C", "E"], correcta: 1, explicacion: "Köppen usa B para clasificar los climas secos y desérticos.", referencia: "Página 81" }
+    ];
+
+    const PREGUNTAS_POR_TEST = 5;
+    let currentQuestions = [];
+    let score = 0;
+    let aciertosCount = 0;
+    let answeredQuestions = new Set();
+    let currentFilter = 'all';
+    let explanationsVisible = false;
+
+    function shuffle(array) {
+      const arr = [...array];
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      return arr;
+    }
+
+    function renderQuestions(questions) {
+      const container = document.getElementById('questionsContainer');
+      if (!container) return;
+      container.innerHTML = '';
+      if(questions.length === 0) {
+        container.innerHTML = '<div class="p-8 text-center text-slate-500 font-bold">No hay preguntas para esta sección.</div>';
+        return;
+      }
+      questions.forEach((q, idx) => {
+        const card = document.createElement('div');
+        card.className = "bg-white rounded-3xl p-6 card-shadow border border-slate-200/80";
+
+        let optionsHTML = '';
+        const letras = ['A', 'B', 'C', 'D'];
+        q.opciones.forEach((opt, optIdx) => {
+          optionsHTML += `
+            <button onclick="checkAnswer(${q.id}, ${optIdx})" 
+                    id="btn-${q.id}-${optIdx}"
+                    class="opt-btn-${q.id} w-full text-left p-4 rounded-2xl border-2 border-slate-100 hover:border-brand-accent hover:bg-sky-50 font-bold text-slate-600 text-sm transition-all flex items-center gap-4 mb-3 group">
+              <span id="badge-letra-${q.id}-${optIdx}" class="w-8 h-8 rounded-xl bg-slate-100 text-slate-500 flex items-center justify-center text-sm group-hover:bg-brand-accent group-hover:text-white transition-colors">${letras[optIdx]}</span>
+              <span class="flex-1 leading-snug">${opt}</span>
+              <i id="icon-status-${q.id}-${optIdx}" class="fa-regular fa-circle text-slate-200 text-xl group-hover:text-brand-accent"></i>
+            </button>
+          `;
+        });
+
+        card.innerHTML = `
+          <div class="flex items-center gap-2 border-b border-slate-100 pb-3 mb-4">
+            <span class="bg-brand-main text-white font-black text-xs px-3 py-1.5 rounded-lg">P. ${idx + 1}</span>
+            <span class="bg-slate-100 text-slate-500 font-bold text-xs px-3 py-1.5 rounded-lg">${q.secuencia}</span>
+          </div>
+          <h3 class="text-lg sm:text-xl font-black text-slate-800 mb-6 leading-snug">${q.pregunta}</h3>
+          <div>${optionsHTML}</div>
+          <div id="expanded-${q.id}" class="hidden mt-6 bg-slate-50 border border-slate-200 rounded-2xl p-5 animate-fade-in shadow-inner">
+            <h4 class="font-black text-brand-main text-sm mb-2"><i class="fa-solid fa-lightbulb text-brand-accent"></i> Explicación</h4>
+            <p class="text-slate-700 text-sm mb-3 leading-relaxed">${q.explicacion}</p>
+            <div class="text-xs font-bold text-slate-400 border-t border-slate-200 pt-3"><i class="fa-solid fa-bookmark text-slate-300"></i> ${q.referencia}</div>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function checkAnswer(qId, selectedIdx) {
+      if (answeredQuestions.has(qId)) return;
+      const q = currentQuestions.find(item => item.id === qId);
+      if (!q) return;
+      const isCorrect = selectedIdx === q.correcta;
+      playSound(isCorrect ? 'correct' : 'incorrect');
+
+      const buttons = document.querySelectorAll(`.opt-btn-${qId}`);
+      buttons.forEach((btn, idx) => {
+        btn.disabled = true;
+        const badge = document.getElementById(`badge-letra-${qId}-${idx}`);
+        const icon = document.getElementById(`icon-status-${qId}-${idx}`);
+
+        if (idx === q.correcta) {
+          btn.className = "w-full text-left p-4 rounded-2xl border-2 border-emerald-400 bg-emerald-50 text-emerald-900 font-bold text-sm flex items-center gap-4 mb-3";
+          badge.className = "w-8 h-8 rounded-xl bg-emerald-500 text-white flex items-center justify-center text-sm shadow-md";
+          icon.className = "fa-solid fa-circle-check text-emerald-500 text-xl";
+        } else if (idx === selectedIdx && !isCorrect) {
+          btn.className = "w-full text-left p-4 rounded-2xl border-2 border-rose-400 bg-rose-50 text-rose-900 font-bold text-sm flex items-center gap-4 mb-3";
+          badge.className = "w-8 h-8 rounded-xl bg-rose-500 text-white flex items-center justify-center text-sm shadow-md";
+          icon.className = "fa-solid fa-circle-xmark text-rose-500 text-xl";
+        } else {
+          btn.classList.add('opacity-40');
+        }
+      });
+
+      if (isCorrect) { score += 10; aciertosCount++; }
+      answeredQuestions.add(qId);
+      document.getElementById('scoreDisplay').innerText = score;
+      document.getElementById('aciertosDisplay').innerText = `${aciertosCount}/${currentQuestions.length}`;
+      document.getElementById(`expanded-${qId}`).classList.remove('hidden');
+    }
+
+    function toggleExplanations() {
+      explanationsVisible = !explanationsVisible;
+      const btn = document.getElementById('btnToggleExpl');
+      if (!btn) return;
+      if (explanationsVisible) {
+        btn.innerHTML = '<i class="fa-solid fa-eye-slash text-brand-accent"></i> Ocultar';
+        currentQuestions.forEach(q => document.getElementById(`expanded-${q.id}`)?.classList.remove('hidden'));
+      } else {
+        btn.innerHTML = '<i class="fa-solid fa-eye text-brand-accent"></i> Respuestas';
+        currentQuestions.forEach(q => { if(!answeredQuestions.has(q.id)) document.getElementById(`expanded-${q.id}`)?.classList.add('hidden'); });
+      }
+    }
+
+    function resetQuiz(filterTarget = 'current') {
+      score = 0;
+      aciertosCount = 0;
+      answeredQuestions.clear();
+      explanationsVisible = false;
+      const btnExpl = document.getElementById('btnToggleExpl');
+      if(btnExpl) btnExpl.innerHTML = '<i class="fa-solid fa-eye text-brand-accent"></i> Respuestas';
+
+      if (filterTarget !== 'current') currentFilter = filterTarget;
+
+      let pool = questionsPool;
+      const labelEl = document.getElementById('filtroActualTexto');
+      if (currentFilter !== 'all') {
+        pool = questionsPool.filter(q => q.secuencia.startsWith(currentFilter));
+        if(labelEl) labelEl.innerHTML = `<i class="fa-solid fa-filter text-brand-accent"></i> Filtrando: ${currentFilter}`;
+      } else {
+        if(labelEl) labelEl.innerHTML = `<i class="fa-solid fa-layer-group text-brand-accent"></i> Todas las Secuencias`;
+      }
+      
+      const limit = Math.min(PREGUNTAS_POR_TEST, pool.length);
+      currentQuestions = shuffle(pool).slice(0, limit);
+      
+      if(document.getElementById('scoreDisplay')) document.getElementById('scoreDisplay').innerText = '0';
+      if(document.getElementById('aciertosDisplay')) document.getElementById('aciertosDisplay').innerText = `0/${limit}`;
+      renderQuestions(currentQuestions);
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      showFact(0);
+      resetQuiz('all');
+    });
+  </script>
+</body>
+</html>
